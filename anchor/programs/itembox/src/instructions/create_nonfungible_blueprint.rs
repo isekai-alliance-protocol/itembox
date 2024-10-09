@@ -57,6 +57,7 @@ pub struct CreateNonFungibleBlueprint<'info> {
   pub system_program: Program<'info, System>,
 }
 
+// TODO: include verifier, profile account
 pub fn create_nonfungible_blueprint_handler(
   ctx: Context<CreateNonFungibleBlueprint>, 
   args: CreateNonFungibleBlueprintArgs
@@ -66,7 +67,7 @@ pub fn create_nonfungible_blueprint_handler(
   let owner = &ctx.accounts.owner;
   let main = &ctx.accounts.main;
   let collection = &ctx.accounts.collection;
-  let mint_fee = ctx.accounts.main.blueprint_mint_fee;
+  let mint_fee = ctx.accounts.main.blueprint_creation_fee;
 
   // pay fee to treasury
 

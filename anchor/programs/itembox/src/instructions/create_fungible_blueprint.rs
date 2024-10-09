@@ -84,6 +84,7 @@ pub struct CreateFungibleBlueprint<'info> {
   pub token_program: Program<'info, Token2022>,
 }
 
+// TODO: include verifier, profile account
 pub fn create_fungible_blueprint_handler(
   ctx: Context<CreateFungibleBlueprint>,
   args: CreateFungibleBlueprintArgs
@@ -92,7 +93,7 @@ pub fn create_fungible_blueprint_handler(
   let blueprint = &mut ctx.accounts.blueprint;
   let treasury = &mut ctx.accounts.treasury;
   let owner = &ctx.accounts.owner;
-  let mint_fee = ctx.accounts.main.blueprint_mint_fee;
+  let mint_fee = ctx.accounts.main.blueprint_creation_fee;
 
   // pay fee to treasury
 

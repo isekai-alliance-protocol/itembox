@@ -6,6 +6,13 @@ pub struct Blueprint {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
 
+  /// Status that tells that the Blueprint is okay to be displayed in "Explore Blueprints" page. (1)
+  pub verified: bool,
+
+  /// Status that tells that the Blueprint is ready to be used and displayed. 
+  /// Can be toggled off by the author if counter == 0. (1)
+  pub published: bool,
+
   /// The address of the metaplex core collection with master edition plugin OR
   /// the mint address of the fungible token. (32)
   pub mint: Pubkey,
@@ -28,13 +35,13 @@ pub struct Blueprint {
   /// Number of editions printed, if mint is a Master Edition. (8)
   pub counter: u32,
 
-  // Unused reserved byte space for future additive changes. (128)
+  /// Unused reserved byte space for future additive changes. (128)
   pub _reserved: [u8; 128],
 }
 
 impl Blueprint {
   pub fn len() -> usize {
-    8 + 1 + 32 + 1 + 32 + 32 + 32 + 4 + 128
+    8 + 1 + 1 + 1 + 32 + 1 + 32 + 32 + 32 + 4 + 128
   }
 
   pub fn from_account_info(account_info: &AccountInfo) -> Result<Self> {
