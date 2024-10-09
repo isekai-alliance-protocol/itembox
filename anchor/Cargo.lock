@@ -1138,7 +1138,6 @@ dependencies = [
  "anchor-spl",
  "mpl-core",
  "mpl-token-metadata",
- "solana-program",
  "spl-pod",
  "spl-tlv-account-resolution",
  "spl-transfer-hook-interface",
