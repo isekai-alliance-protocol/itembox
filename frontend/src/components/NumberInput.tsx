@@ -1,5 +1,5 @@
 import React, { useState, useEffect, InputHTMLAttributes } from 'react'
-import BN from 'bn.js'
+import { BN } from '@coral-xyz/anchor'
 import { formatNumberBN, parseNumberBN } from '../utils/formatNumber'
 
 interface NumberInputProps
