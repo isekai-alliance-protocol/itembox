@@ -7,11 +7,14 @@ skip-lint = false
 [programs.localnet]
 itembox = "4nguiyc8un36HUSaS14K7yau91JPyed4oEadt5hVR7BT"
 
+[programs.devnet]
+itembox = "4nguiyc8un36HUSaS14K7yau91JPyed4oEadt5hVR7BT"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [[test.genesis]]

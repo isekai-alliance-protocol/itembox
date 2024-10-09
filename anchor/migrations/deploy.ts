@@ -1,12 +1,35 @@
-// Migrations are an early feature. Currently, they're nothing more than this
-// single deploy script that's invoked from the CLI, injecting a provider
-// configured from the workspace's Anchor.toml.
+import { BN, Program, Provider, setProvider } from '@coral-xyz/anchor'
+import { Itembox } from '../target/types/itembox'
+import idl from '../target/idl/itembox.json'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 
-const anchor = require("@coral-xyz/anchor");
+module.exports = async function (provider: Provider) {
+  setProvider(provider)
 
-module.exports = async function (provider) {
-  // Configure client to use the provider.
-  anchor.setProvider(provider);
+  const itemBoxIdl = idl as Itembox
+  const program = new Program<Itembox>(itemBoxIdl, provider)
 
-  // Add your deploy script here.
-};
+  const [mainPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from('main')],
+    program.programId
+  )
+
+  console.log('Main PDA address', mainPda.toBase58())
+
+  try {
+    await program.methods
+      .init({
+        blueprintMintFee: new BN(0.0002 * LAMPORTS_PER_SOL),
+        tokenMint: new PublicKey(
+          'DQTNP5FBEcCsEkdPH5JQfAjJAyAavbCHfhk2T5YAUj4L'
+        ),
+        treasury: provider.publicKey,
+      })
+      .accounts({
+        authority: provider.publicKey,
+      })
+      .rpc()
+  } catch (e) {
+    console.error(e)
+  }
+}
