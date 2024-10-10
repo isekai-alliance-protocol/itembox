@@ -7,11 +7,13 @@ pub struct Blueprint {
   pub bump: u8,
 
   /// Status that tells that the Blueprint is okay to be displayed in "Explore Blueprints" page. (1)
-  pub verified: bool,
+  /// Pending [0], Approved [1], Rejected [2], Pre-approved [3]
+  pub verified: u8,
 
   /// Status that tells that the Blueprint is ready to be used and displayed. 
   /// Can be toggled off by the author if counter == 0. (1)
-  pub published: bool,
+  /// Unpublished [0], Published [1]
+  pub published: u8,
 
   /// The address of the metaplex core collection with master edition plugin OR
   /// the mint address of the fungible token. (32)
