@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(Debug)]
+#[derive(InitSpace)]
 pub struct Blueprint {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
@@ -42,10 +42,6 @@ pub struct Blueprint {
 }
 
 impl Blueprint {
-  pub fn len() -> usize {
-    8 + 1 + 1 + 1 + 32 + 1 + 32 + 32 + 32 + 4 + 128
-  }
-
   pub fn from_account_info(account_info: &AccountInfo) -> Result<Self> {
     // Borrow data from the account_info and skip the first 8 bytes (the discriminator)
     let borrowed_data = &account_info.try_borrow_data()?[8..];
@@ -54,3 +50,7 @@ impl Blueprint {
     Blueprint::try_from_slice(borrowed_data).map_err(|_| ProgramError::InvalidAccountData.into())
   }
 }
+
+// TODO: ASSET ADAPTER
+// - abstracts common CPI calls, burn, transfer, etc
+// - abstract any information for metadata, etc.

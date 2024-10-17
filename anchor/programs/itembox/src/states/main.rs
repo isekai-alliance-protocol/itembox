@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[account]
+#[derive(InitSpace)]
 pub struct Main {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
@@ -31,10 +32,4 @@ pub struct Main {
 
   /// Unused reserved byte space for future additive changes. (128)
   pub _reserved: [u8; 128],
-}
-
-impl Main {
-  pub fn len() -> usize {
-    8 + 1 + 32 + 32 + 32 + 32 + 32 + 8 + 8 + 8 + 128
-  }
 }

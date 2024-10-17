@@ -1,8 +1,16 @@
-// profiles are verified users of itembox
-// when they create blueprints and recipes, 
-// they are automatically set to verified
+use anchor_lang::prelude::*;
 
-// Created profiles have additional features such as additional description on the profile page,
-// games created and skinned Blueprint and Recipe cards. (32)
+#[account]
+#[derive(InitSpace)]
+pub struct Profile {
 
-// status: on review
+  /// Owner of this profile (seeds = ["profile", authority]). (32)
+  pub authority: Pubkey,
+
+  /// Status of the profile: On Review [0], Published [1], Banned [2]. (1)
+  pub status: u8,
+
+  /// External JSON details of the profile. (200)
+  #[max_len(200)]
+  pub uri: String
+}

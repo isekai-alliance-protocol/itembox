@@ -23,7 +23,7 @@ pub struct Init<'info> {
       b"main",
     ], 
     bump, 
-    space = Main::len()
+    space = 8 + Main::INIT_SPACE
   )]
   pub main: Box<Account<'info, Main>>,
 
