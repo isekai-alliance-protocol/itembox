@@ -5,9 +5,7 @@ use anchor_spl::token_interface::{
 };
 
 use crate::{
-  get_meta_list_size, 
-  update_account_lamports_to_minimum_balance, META_LIST_ACCOUNT_SEED,
-  states::{Blueprint, Main}
+  get_meta_list_size, states::{Blueprint, Main, Profile}, update_account_lamports_to_minimum_balance, META_LIST_ACCOUNT_SEED
 };
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
@@ -17,6 +15,7 @@ pub struct CreateFungibleBlueprintArgs {
   symbol: String,
   treasury: Pubkey,
   mint_authority: Pubkey,
+  publish: bool
 }
 
 #[derive(Accounts)]
@@ -31,7 +30,7 @@ pub struct CreateFungibleBlueprint<'info> {
       mint.key().as_ref()
     ], 
     bump, 
-    space = Blueprint::len()
+    space = 8 + Blueprint::INIT_SPACE
   )]
   pub blueprint: Box<Account<'info, Blueprint>>,
 
@@ -68,6 +67,12 @@ pub struct CreateFungibleBlueprint<'info> {
   )]
   pub mint: Box<InterfaceAccount<'info, Mint>>,
 
+  #[account(
+    seeds = [b"profile", owner.key().as_ref()],
+    bump = profile.bump
+  )]
+  pub profile: Option<Box<Account<'info, Profile>>>,
+
   #[account(mut)]
   pub owner: Signer<'info>,
 
@@ -93,6 +98,7 @@ pub fn create_fungible_blueprint_handler(
   let blueprint = &mut ctx.accounts.blueprint;
   let treasury = &mut ctx.accounts.treasury;
   let owner = &ctx.accounts.owner;
+  let profile = &ctx.accounts.profile;
   let mint_fee = ctx.accounts.main.blueprint_creation_fee;
 
   // pay fee to treasury
@@ -118,6 +124,11 @@ pub fn create_fungible_blueprint_handler(
   blueprint.treasury = args.treasury.key();
   blueprint.mint_authority = args.mint_authority.key();
   blueprint.counter = 0;
+  blueprint.published = if args.publish { 1 } else { 0 };
+  blueprint.status = profile
+    .as_ref()
+    .map(|p| if p.status == 1 { 3 } else { 0 })
+    .unwrap_or(0);
 
   ctx.accounts.initialize_token_metadata(
     args.name.clone(),

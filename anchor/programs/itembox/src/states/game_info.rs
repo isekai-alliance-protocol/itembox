@@ -3,6 +3,8 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct GameInfo {
+  /// Bump nonce of the PDA. (1)
+  pub bump: u8,
 
   /// Owner of this game info. (32)
   pub authority: Pubkey,

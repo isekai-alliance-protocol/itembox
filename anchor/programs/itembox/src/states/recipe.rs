@@ -5,7 +5,7 @@ pub struct Recipe {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
 
-  /// Pending [0], Published [1], Awaiting peer review [2], Rejected [3]. (1)
+  /// Pending [0], Published [1], Awaiting peer review [2], Rejected by peer [3]. (1)
   pub status: u8,
 
   /// The blueprint to use to produce the item of this recipe. (32)

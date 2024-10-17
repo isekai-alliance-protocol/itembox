@@ -7,6 +7,7 @@ use anchor_spl::{token::spl_token, token_2022::spl_token_2022};
 pub struct CreateRecipeArgs {
   ingredients: Vec<IngredientDefinition>,
   output_amount: u64,
+  publish: bool,
 }
 
 #[derive(Accounts)]
@@ -31,7 +32,9 @@ pub struct CreateRecipe<'info> {
   pub authority: Signer<'info>,
 
   #[account(
-    has_one = authority
+    has_one = authority,
+    constraint = blueprint.status != 2 @ CreateRecipeError::BlueprintBanned,
+    constraint = blueprint.status != 4 @ CreateRecipeError::PendingIntegration
   )]
   pub blueprint: Account<'info, Blueprint>,
 
@@ -40,11 +43,13 @@ pub struct CreateRecipe<'info> {
 
 pub fn create_recipe_handler(ctx: Context<CreateRecipe>, args: CreateRecipeArgs) -> Result<()> {
   let recipe = &mut ctx.accounts.recipe;
+  let blueprint = &ctx.accounts.blueprint;
   let remaining_accounts = ctx.remaining_accounts;
 
   recipe.bump = ctx.bumps.recipe;
   recipe.blueprint = ctx.accounts.blueprint.key();
   recipe.output_amount = args.output_amount;
+  recipe.status = if blueprint.status == 5 { 2 } else if args.publish { 1 } else { 0 };
 
   let mut clear_requirements = false;
   
@@ -67,6 +72,8 @@ pub fn create_recipe_handler(ctx: Context<CreateRecipe>, args: CreateRecipeArgs)
       // TODO: SECURITY RISK, we cannot rely with this comparison
       if account_info.owner.eq(&crate::id()) {
         let blueprint_account = Blueprint::from_account_info(&account_info)?;
+
+        // TODO: check discriminator, it should be Blueprint
         
         recipe.ingredients.push(Ingredient {
           amount: ingredient.amount,
@@ -141,5 +148,11 @@ pub enum CreateRecipeError {
   IngredientIsRetainOnly,
 
   #[msg("No ingredients provided")]
-  NoIngredients
+  NoIngredients,
+
+  #[msg("The blueprint is banned")]
+  BlueprintBanned,
+
+  #[msg("Blueprint has pending integration and is not allowed to create new recipes at the moment")]
+  PendingIntegration
 }

@@ -1,7 +1,7 @@
 // use mpl_core to create a master edition collection
 
 use anchor_lang::prelude::*;
-use crate::states::{Main, Blueprint};
+use crate::states::{Blueprint, Main, Profile};
 
 use mpl_core::{
   instructions::CreateCollectionV2CpiBuilder, 
@@ -14,6 +14,7 @@ pub struct CreateNonFungibleBlueprintArgs {
   uri: String,
   treasury: Pubkey,
   mint_authority: Pubkey,
+  publish: bool
 }
 
 #[derive(Accounts)]
@@ -27,7 +28,7 @@ pub struct CreateNonFungibleBlueprint<'info> {
       collection.key().as_ref()
     ], 
     bump, 
-    space = Blueprint::len()
+    space = 8 + Blueprint::INIT_SPACE
   )]
   pub blueprint: Box<Account<'info, Blueprint>>,
 
@@ -47,6 +48,12 @@ pub struct CreateNonFungibleBlueprint<'info> {
   #[account(mut)]
   pub collection: Signer<'info>,
 
+  #[account(
+    seeds = [b"profile", owner.key().as_ref()],
+    bump = profile.bump
+  )]
+  pub profile: Option<Box<Account<'info, Profile>>>,
+
   #[account(mut)]
   pub owner: Signer<'info>,
 
@@ -65,6 +72,7 @@ pub fn create_nonfungible_blueprint_handler(
   let blueprint = &mut ctx.accounts.blueprint;
   let treasury = &mut ctx.accounts.treasury;
   let owner = &ctx.accounts.owner;
+  let profile = &ctx.accounts.profile;
   let main = &ctx.accounts.main;
   let collection = &ctx.accounts.collection;
   let mint_fee = ctx.accounts.main.blueprint_creation_fee;
@@ -92,6 +100,11 @@ pub fn create_nonfungible_blueprint_handler(
   blueprint.treasury = args.treasury.key();
   blueprint.mint_authority = args.mint_authority.key();
   blueprint.counter = 0;
+  blueprint.published = if args.publish { 1 } else { 0 };
+  blueprint.status = profile
+    .as_ref()
+    .map(|p| if p.status == 1 { 3 } else { 0 })
+    .unwrap_or(0);
 
   // create core collection with master edition plugin
 

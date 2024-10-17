@@ -6,9 +6,9 @@ pub struct Blueprint {
   /// Bump nonce of the PDA. (1)
   pub bump: u8,
 
-  /// Status that tells that the Blueprint is okay to be displayed in "Explore Blueprints" page. (1)
-  /// Pending [0], Approved [1], Rejected [2], Pre-approved [3]
-  pub verified: u8,
+  /// Status that tells that the Blueprint is okay to be displayed in "Explore Blueprints" page. 
+  /// Pending [0], Verified [1], Banned [2], Pre-verified [3], Pending Integration [4], Approved & Integrated [5]. (1)
+  pub status: u8,
 
   /// Status that tells that the Blueprint is ready to be used and displayed. 
   /// Can be toggled off by the author if counter == 0. (1)

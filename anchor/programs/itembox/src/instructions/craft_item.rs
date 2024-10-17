@@ -46,14 +46,17 @@ pub struct CraftItemArgs {
 #[instruction(args: CraftItemArgs)]
 pub struct CraftItem<'info> {
   #[account(
-    has_one = blueprint
+    has_one = blueprint,
+    constraint = recipe.status == 1 @ CraftItemError::RecipeNotAvailable
   )]
   pub recipe: Box<Account<'info, Recipe>>,
 
   #[account(
     mut, 
     has_one = mint,
-    has_one = treasury
+    has_one = treasury,
+    constraint = blueprint.status != 2 @ CraftItemError::BlueprintBanned,
+    constraint = blueprint.published == 1 @ CraftItemError::BlueprintUnpublished
   )]
   pub blueprint: Box<Account<'info, Blueprint>>,
 
@@ -530,6 +533,15 @@ pub enum CraftItemError {
 
   #[msg("Missing owner associated token account")]
   MissingOwnerAtaAccount,
+
+  #[msg("Blueprint is banned")]
+  BlueprintBanned,
+
+  #[msg("Blueprint is currently unpublished")]
+  BlueprintUnpublished,
+
+  #[msg("Recipe is not available")]
+  RecipeNotAvailable,
 }
 
 // had to manually do this due to ata lib issues

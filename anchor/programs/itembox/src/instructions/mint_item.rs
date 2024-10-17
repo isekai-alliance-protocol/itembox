@@ -28,7 +28,8 @@ pub struct MintItem<'info> {
   #[account(
     mut, 
     has_one = mint,
-    has_one = mint_authority
+    has_one = mint_authority,
+    constraint = blueprint.status != 2 @ MintItemError::BlueprintBanned,
   )]
   pub blueprint: Box<Account<'info, Blueprint>>,
 
@@ -147,4 +148,7 @@ pub enum MintItemError {
 
   #[msg("Cannot mint more than one non-fungible item")]
   CannotMintMoreThanOneNonFungibleItem,
+
+  #[msg("The blueprint is banned")]
+  BlueprintBanned,
 }

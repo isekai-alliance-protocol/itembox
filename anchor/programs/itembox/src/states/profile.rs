@@ -3,6 +3,8 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Profile {
+  /// Bump nonce of the PDA. (1)
+  pub bump: u8,
 
   /// Owner of this profile (seeds = ["profile", authority]). (32)
   pub authority: Pubkey,
